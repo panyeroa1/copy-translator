@@ -257,11 +257,13 @@ textarea {
   outline: none;
   font-size: 18px;
   resize: none;
+  -webkit-user-select: text;
   user-select: text;
 }
 
 input::placeholder,
 textarea::placeholder {
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -288,6 +290,7 @@ button {
   border: none;
   font-size: 16px;
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
   display: flex;
   align-items: center;
@@ -609,6 +612,7 @@ header .export-button {
   height: 48px;
   border-radius: 18px;
   border: 1px solid rgba(0, 0, 0, 0);
+  -webkit-user-select: none;
   user-select: none;
   cursor: pointer;
 }
@@ -779,6 +783,7 @@ textarea,
 .control-tray .connection-container .text-indicator {
   font-size: 11px;
   color: var(--Blue-500);
+  -webkit-user-select: none;
   user-select: none;
 }
 
