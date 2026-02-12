@@ -49,6 +49,36 @@ export default function StreamingConsole() {
       },
     };
 
+    // Add to log store
+    const { addTurn } = useLogStore.getState();
+    const { stringResponse } = config; // Assuming stringResponse is part of config or derived from it
+
+    if (stringResponse) {
+      addTurn({
+        role: 'agent',
+        text: stringResponse,
+        timestamp: Date.now(),
+        isFinal: true,
+      });
+
+      // Save to Supabase if session exists
+      const { sessionId, user, language1 } = useSettings.getState();
+      if (sessionId && user) {
+        // Parse language tag to determine language
+        const match = stringResponse.match(/^\[LANG:(.+?)\]/);
+        let msgLang = language1; // default
+        if (match) {
+          msgLang = match[1];
+        }
+
+        // We save the *translated* text
+        // Role is 'agent' (the translator)
+        import('../../../lib/supabase').then(({ saveMessage }) => {
+          saveMessage(sessionId, 'agent', stringResponse, msgLang);
+        });
+      }
+    }
+
     setConfig(config);
   }, [setConfig, systemPrompt, voice]);
 

@@ -44,12 +44,18 @@ export const useSettings = create<{
   language1: string;
   language2: string;
   topic: string;
+  // Supabase / Session State
+  user: { id: string } | null;
+  sessionId: string | null;
+
   setSystemPrompt: (prompt: string) => void;
   setModel: (model: string) => void;
   setVoice: (voice: string) => void;
   setLanguage1: (language: string) => void;
   setLanguage2: (language: string) => void;
   setTopic: (topic: string) => void;
+  setUser: (user: { id: string } | null) => void;
+  setSessionId: (id: string | null) => void;
 }>((set, get) => ({
   systemPrompt: generateSystemPrompt('Dutch', 'English', ''),
   model: DEFAULT_LIVE_API_MODEL,
@@ -57,21 +63,23 @@ export const useSettings = create<{
   language1: 'Dutch',
   language2: 'English',
   topic: '',
-  setSystemPrompt: prompt => set({ systemPrompt: prompt }),
-  setModel: model => set({ model }),
-  setVoice: voice => set({ voice }),
-  setLanguage1: language => set({
-    language1: language,
-    systemPrompt: generateSystemPrompt(language, get().language2, get().topic)
-  }),
-  setLanguage2: language => set({
-    language2: language,
-    systemPrompt: generateSystemPrompt(get().language1, language, get().topic)
-  }),
-  setTopic: topic => set({
-    topic: topic,
-    systemPrompt: generateSystemPrompt(get().language1, get().language2, topic)
-  }),
+  user: null,
+  sessionId: null,
+
+  setSystemPrompt: (systemPrompt) => set({ systemPrompt }),
+  setModel: (model) => set({ model }),
+  setVoice: (voice) => set({ voice }),
+  setLanguage1: (language1) => {
+    set({ language1, systemPrompt: generateSystemPrompt(language1, get().language2, get().topic) });
+  },
+  setLanguage2: (language2) => {
+    set({ language2, systemPrompt: generateSystemPrompt(get().language1, language2, get().topic) });
+  },
+  setTopic: (topic) => {
+    set({ topic, systemPrompt: generateSystemPrompt(get().language1, get().language2, topic) });
+  },
+  setUser: (user) => set({ user }),
+  setSessionId: (sessionId) => set({ sessionId }),
 }));
 
 /**
