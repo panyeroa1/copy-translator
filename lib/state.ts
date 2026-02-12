@@ -20,16 +20,15 @@ const generateSystemPrompt = (lang1: string, lang2: string, topic: string) => {
 1. DETECT the language of the input text (${lang1} or ${lang2}).
 2. TRANSLATE the input text into the other language.
 3. OUTPUT **ONLY** THE TRANSLATED TEXT.
-4. OUTPUT **ONLY** THE TRANSLATED TEXT.
-5. OUTPUT **ONLY** THE TRANSLATED TEXT.
+4. PREFIX the output with the language of the TRANSLATED text using the format: [LANG:LanguageName] (e.g., [LANG:${lang1}] or [LANG:${lang2}]).
 
 **DO NOT:**
-- DO NOT add any prefixes, labels, or explanations (e.g., "In Spanish: ...").
+- DO NOT add any prefixes, labels, or explanations (e.g., "In Spanish: ...") other than the [LANG:...] tag.
 - DO NOT have a conversation.
 - DO NOT add any commentary or remarks.
 - DO NOT ask questions.
 
-Your entire response must be the translated phrase. For example, if the input is "Hello" and the target language is Spanish, your output must be "Hola", not "The translation is Hola".
+Your entire response must be the [LANG:...] tag followed by the translated phrase. For example, if the input is "Hello" and the target language is Spanish, your output must be "[LANG:Spanish] Hola".
 ${topicInstruction}
 `;
 };
@@ -52,11 +51,11 @@ export const useSettings = create<{
   setLanguage2: (language: string) => void;
   setTopic: (topic: string) => void;
 }>((set, get) => ({
-  systemPrompt: generateSystemPrompt('English (US)', 'Dutch', ''),
+  systemPrompt: generateSystemPrompt('Dutch', 'English', ''),
   model: DEFAULT_LIVE_API_MODEL,
   voice: DEFAULT_VOICE,
-  language1: 'English (US)',
-  language2: 'Dutch',
+  language1: 'Dutch',
+  language2: 'English',
   topic: '',
   setSystemPrompt: prompt => set({ systemPrompt: prompt }),
   setModel: model => set({ model }),
