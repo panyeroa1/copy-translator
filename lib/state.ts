@@ -21,6 +21,8 @@ const generateSystemPrompt = (lang1: string, lang2: string, topic: string) => {
 2. TRANSLATE the input text into the other language.
 3. OUTPUT **ONLY** THE TRANSLATED TEXT.
 4. PREFIX the output with the language of the TRANSLATED text using the format: [LANG:LanguageName] (e.g., [LANG:${lang1}] or [LANG:${lang2}]).
+5. **EMOTIONAL NUANCE:** You MUST listen to the tone, pitch, and emotion of the speaker. Your audio output should MIMIC the emotional state (excited, sad, urgent, calm, etc.) and intensity of the original source. Do not translate in a flat, robotic voice if the source is expressive.
+6. **VOICE PERSONA:** When translating for the Staff (outputting ${lang2}), you represent "Orus". When translating for the Guest (outputting ${lang1}), you represent "Charon". Try to distinguish the styling slightly if possible.
 
 **DO NOT:**
 - DO NOT add any prefixes, labels, or explanations (e.g., "In Spanish: ...") other than the [LANG:...] tag.
@@ -40,7 +42,9 @@ ${topicInstruction}
 export const useSettings = create<{
   systemPrompt: string;
   model: string;
-  voice: string;
+  voiceStaff: string; // Staff voice
+  voiceGuest: string; // Guest voice
+  // voice: string; // Deprecated single voice accessor if needed, or we just map it to staff
   language1: string;
   language2: string;
   topic: string;
@@ -50,7 +54,8 @@ export const useSettings = create<{
 
   setSystemPrompt: (prompt: string) => void;
   setModel: (model: string) => void;
-  setVoice: (voice: string) => void;
+  setVoiceStaff: (voice: string) => void;
+  setVoiceGuest: (voice: string) => void;
   setLanguage1: (language: string) => void;
   setLanguage2: (language: string) => void;
   setTopic: (topic: string) => void;
@@ -59,7 +64,8 @@ export const useSettings = create<{
 }>((set, get) => ({
   systemPrompt: generateSystemPrompt('Dutch', 'English', ''),
   model: DEFAULT_LIVE_API_MODEL,
-  voice: DEFAULT_VOICE,
+  voiceStaff: 'Orus',
+  voiceGuest: 'Charon',
   language1: 'Dutch',
   language2: 'English',
   topic: '',
@@ -68,7 +74,8 @@ export const useSettings = create<{
 
   setSystemPrompt: (systemPrompt) => set({ systemPrompt }),
   setModel: (model) => set({ model }),
-  setVoice: (voice) => set({ voice }),
+  setVoiceStaff: (voiceStaff) => set({ voiceStaff }),
+  setVoiceGuest: (voiceGuest) => set({ voiceGuest }),
   setLanguage1: (language1) => {
     set({ language1, systemPrompt: generateSystemPrompt(language1, get().language2, get().topic) });
   },
@@ -115,8 +122,8 @@ export interface LiveClientToolResponse {
 }
 export interface GroundingChunk {
   web?: {
-    uri: string;
-    title: string;
+    uri?: string;
+    title?: string;
   };
 }
 

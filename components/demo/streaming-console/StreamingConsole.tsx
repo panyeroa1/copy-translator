@@ -12,13 +12,14 @@ import {
   useSettings,
   useLogStore,
   ConversationTurn,
+  GroundingChunk,
 } from '../../../lib/state';
 import { useHistoryStore } from '../../../lib/history';
 import { useAuth, updateUserConversations } from '../../../lib/auth';
 
 export default function StreamingConsole() {
   const { client, setConfig } = useLiveAPIContext();
-  const { systemPrompt, voice, language1, language2 } = useSettings();
+  const { systemPrompt, voiceStaff, language1, language2 } = useSettings();
   const { addHistoryItem } = useHistoryStore();
   const { user } = useAuth();
 
@@ -34,7 +35,8 @@ export default function StreamingConsole() {
       speechConfig: {
         voiceConfig: {
           prebuiltVoiceConfig: {
-            voiceName: voice,
+            // Defaulting use of Staff voice for the session for now
+            voiceName: voiceStaff,
           },
         },
       },
@@ -57,7 +59,6 @@ export default function StreamingConsole() {
       addTurn({
         role: 'agent',
         text: stringResponse,
-        timestamp: Date.now(),
         isFinal: true,
       });
 
@@ -80,7 +81,7 @@ export default function StreamingConsole() {
     }
 
     setConfig(config);
-  }, [setConfig, systemPrompt, voice]);
+  }, [setConfig, systemPrompt, voiceStaff]);
 
   useEffect(() => {
     const { addTurn, updateLastTurn } = useLogStore.getState();
@@ -119,7 +120,15 @@ export default function StreamingConsole() {
           ?.map((p: any) => p.text)
           .filter(Boolean)
           .join(' ') ?? '';
-      const groundingChunks = serverContent.groundingMetadata?.groundingChunks;
+      const rawChunks = serverContent.groundingMetadata?.groundingChunks;
+
+      // Map raw chunks to our state's GroundingChunk type
+      const groundingChunks = rawChunks?.map((chunk: any) => ({
+        web: chunk.web ? {
+          uri: chunk.web.uri,
+          title: chunk.web.title
+        } : undefined
+      }));
 
       if (!text && !groundingChunks) return;
 

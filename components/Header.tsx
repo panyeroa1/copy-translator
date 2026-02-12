@@ -48,15 +48,6 @@ export default function Header() {
             <button
               className="login-trigger-btn"
               onClick={() => setShowLogin(true)}
-              style={{
-                background: 'none',
-                border: '1px solid var(--gray-600)',
-                color: 'var(--text)',
-                padding: '4px 12px',
-                borderRadius: '16px',
-                cursor: 'pointer',
-                fontSize: '0.8rem'
-              }}
             >
               Login
             </button>
